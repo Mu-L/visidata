@@ -125,18 +125,26 @@ def saveSheets(vd, givenpath, *vsheets, confirm_overwrite=True):
     unloaded = [ vs for vs in vsheets if vs.rows is UNLOADED ]
     vd.sync(*vd.ensureLoaded(unloaded))
 
-    filetypes = [givenpath.ext.lower(), vd.options.save_filetype.lower()]
+    givenext = givenpath.ext.lower()
+    default_ft = vd.options.save_filetype.lower()
 
     vd.clearCaches()
 
-    for ft in filetypes:
-        savefunc = getattr(vsheets[0], 'save_' + ft, None) or getattr(vd, 'save_' + ft, None)
+    savefunc = None
+    filetype = None
+
+    savefunc = getattr(vsheets[0], 'save_' + givenext, None) or getattr(vd, 'save_' + givenext, None)
+    if savefunc:
+        filetype = givenext
+    else:
+        savefunc = getattr(vsheets[0], 'save_' + default_ft, None) or getattr(vd, 'save_' + default_ft, None)
         if savefunc:
-            filetype = ft
-            break
+            if givenext:
+                vd.confirm(f'no .{givenext} saver, save as {default_ft}? ')  #2286
+            filetype = default_ft
 
     if savefunc is None:
-        vd.fail(f'no function to save as {", ".join(filetypes)}')
+        vd.fail(f'no saver for {givenext} or {default_ft}')
 
     if confirm_overwrite:
         vd.confirmOverwrite(givenpath)
