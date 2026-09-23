@@ -314,7 +314,9 @@ def getDeferredChanges(sheet):
     for row, rowmods in sheet._deferredMods.values():
         rowid = sheet.rowid(row)
         if rowid not in sheet._deferredAdds and rowid not in sheet._deferredDels:
-            mods[rowid] = (row, {col:val for col, val in rowmods.items() if sheet.isChanged(col, row)})
+            changed = {col:val for col, val in rowmods.items() if col in sheet.columns and sheet.isChanged(col, row)}
+            if changed:
+                mods[rowid] = (row, changed)
 
     return sheet._deferredAdds, mods, sheet._deferredDels
 
