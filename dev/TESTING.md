@@ -22,6 +22,7 @@ Defined in `tests/testenv.sh`, which all test scripts source. `test-all.sh` re-e
 | `VD` | `$PYTHON -m visidata --config tests/.visidatarc --visidata-dir tests/.visidata` | VisiData command with stock test config |
 | `NPROCS` | `$(nproc)` | Parallel test processes |
 | `OUTDIR` | `tests/output` | Directory for test output files |
+| `VD_TESTTMP` | `/tmp/vd-tests-<datetime>-XXXXXX` | Scratch dir for the whole run, created by `vd_testtmp` in `test-all.sh`/`test-vdx.sh` and removed when that script exits |
 
 Use `$VD` in test scripts instead of hardcoding `bin/vd` or `python -m visidata`. Both paths call the same `vd_cli()` entry point; `$PYTHON -m visidata` is preferred because it's explicit about which Python interpreter is used. `$VD` includes `--config` and `--visidata-dir` so tests are isolated from the user's personal config.
 
@@ -114,6 +115,7 @@ All three formats allow `#` line comments.
 - Tests should modify data and provide golden output file, rather than using `assert-expr` commands
 - Set explicit cursor positions (e.g., `row 6`) rather than relying on defaults, for test hygiene
 - Explicit saving is not necessary, as the test harness will save the top sheet to the proper output file
+- Write scratch files to `$VD_TESTTMP/<testname>.<ext>`, not `tests/output/` (every file there needs a golden).  Tests never delete files themselves.  See `sqlite-commit.vdx`.
 - Never fetch from the network in tests; use local fixture files instead (flaky connections cause spurious CI failures)
 
 **Creating a new golden test:**

@@ -12,6 +12,7 @@ trap "echo SIGTERM; exit;" SIGTERM
 trap "echo SIGINT; exit;" SIGINT
 
 source tests/testenv.sh
+vd_testtmp
 
 export LC_NUMERIC="en_US.UTF-8" #2867
 export LC_TIME="en_US.UTF-8"
