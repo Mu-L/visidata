@@ -124,6 +124,9 @@ def setWindows(vd, scr, pct=None):
 @VisiData.api
 def draw_all(vd):
     'Draw all sheets in all windows.'
+    if not vd.scrFull:  #3173  no screen in batch mode
+        return
+
     vd.clearCaches()
 
     ss1 = vd.sheetstack(1)
