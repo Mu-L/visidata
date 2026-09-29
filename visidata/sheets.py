@@ -1204,11 +1204,13 @@ def quit(vd, *sheets):
 
     remaining = set(vd.stackedSheets) - set(sheets)
     exiting = not remaining
-    if exiting and vd.options.quitguard and not vd._nextCommands:
-        nmodified = sum(1 for vs in sheets if vs.precious and vs.hasBeenModified)
-        modmsg = f' ({nmodified} sheet(s) modified)' if nmodified else ' (nothing modified)'
-        vd.draw_all()
-        vd.confirm(f'exit VisiData{modmsg}? ')
+    if exiting and not vd._nextCommands:
+        nmodified = sum(1 for vs in sheets if vs.options.quitguard and vs.precious and vs.hasBeenModified)
+        nguarded = sum(1 for vs in sheets if vs.options.getonly('quitguard', vs, False))
+        if nmodified or nguarded:  #3173  clean unguarded exit stays silent
+            modmsg = f'{nmodified} sheet(s) modified' if nmodified else f'{nguarded} sheet(s) guarded'
+            vd.draw_all()
+            vd.confirm(f'exit VisiData ({modmsg})? ')
 
     for vs in sheets:
         if not exiting:
